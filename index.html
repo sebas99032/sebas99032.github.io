@@ -1,0 +1,674 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sebastián Fernández · Ingeniero de Sistemas</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+/* ── RESET & BASE ─────────────────────────────────────────── */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:        #0a0e14;
+  --bg2:       #111720;
+  --bg3:       #1a2130;
+  --border:    rgba(255,255,255,.07);
+  --border2:   rgba(255,255,255,.14);
+  --teal:      #2ee8a5;
+  --teal-dim:  #1a8c64;
+  --teal-glow: rgba(46,232,165,.12);
+  --purple:    #a78bfa;
+  --purple-dim:#6d4ec4;
+  --amber:     #fbbf24;
+  --coral:     #fb7185;
+  --text:      #e2e8f0;
+  --text2:     #94a3b8;
+  --text3:     #475569;
+  --font-display: 'Syne', sans-serif;
+  --font-mono:    'Space Mono', monospace;
+}
+html{scroll-behavior:smooth}
+body{
+  background:var(--bg);
+  color:var(--text);
+  font-family:var(--font-mono);
+  font-size:14px;
+  line-height:1.7;
+  overflow-x:hidden;
+}
+
+/* ── GRID NOISE TEXTURE ───────────────────────────────────── */
+body::before{
+  content:'';
+  position:fixed;inset:0;
+  background-image:
+    linear-gradient(rgba(46,232,165,.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(46,232,165,.03) 1px, transparent 1px);
+  background-size:40px 40px;
+  pointer-events:none;
+  z-index:0;
+}
+
+/* ── LAYOUT ───────────────────────────────────────────────── */
+.page{position:relative;z-index:1;max-width:900px;margin:0 auto;padding:0 24px 80px}
+
+/* ── ANIMATIONS ───────────────────────────────────────────── */
+@keyframes fadeUp{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:translateY(0)}}
+@keyframes blink{50%{opacity:0}}
+@keyframes scanline{0%{transform:translateY(-100%)}100%{transform:translateY(100vh)}}
+@keyframes pulse{0%,100%{opacity:.6}50%{opacity:1}}
+@keyframes barFill{from{width:0}to{width:var(--w)}}
+@keyframes circleAnim{from{stroke-dashoffset:var(--circ)}to{stroke-dashoffset:var(--offset)}}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
+@keyframes glitch{
+  0%,100%{clip-path:inset(0 0 100% 0)}
+  5%{clip-path:inset(20% 0 60% 0);transform:translate(-2px)}
+  10%{clip-path:inset(60% 0 20% 0);transform:translate(2px)}
+  15%{clip-path:inset(0 0 100% 0)}
+}
+
+.reveal{opacity:0;transform:translateY(28px);transition:opacity .7s ease,transform .7s ease}
+.reveal.visible{opacity:1;transform:translateY(0)}
+
+/* ── SCANLINE ─────────────────────────────────────────────── */
+.scanline{
+  position:fixed;top:0;left:0;right:0;height:2px;
+  background:linear-gradient(transparent,rgba(46,232,165,.15),transparent);
+  animation:scanline 6s linear infinite;
+  pointer-events:none;z-index:100;
+}
+
+/* ── NAV ──────────────────────────────────────────────────── */
+nav{
+  display:flex;justify-content:space-between;align-items:center;
+  padding:20px 0;
+  border-bottom:1px solid var(--border);
+  margin-bottom:60px;
+}
+.nav-logo{font-family:var(--font-display);font-weight:800;font-size:16px;color:var(--teal);letter-spacing:-.01em}
+.nav-links{display:flex;gap:24px}
+.nav-links a{
+  color:var(--text3);text-decoration:none;font-size:12px;
+  transition:color .2s;letter-spacing:.05em;
+}
+.nav-links a:hover{color:var(--teal)}
+
+/* ── HERO ─────────────────────────────────────────────────── */
+.hero{padding:20px 0 70px;animation:fadeUp .8s ease both}
+.hero-label{
+  font-size:11px;letter-spacing:.2em;color:var(--teal);
+  margin-bottom:16px;display:flex;align-items:center;gap:8px;
+}
+.hero-label::before{
+  content:'';display:inline-block;
+  width:24px;height:1px;background:var(--teal);
+}
+.hero h1{
+  font-family:var(--font-display);
+  font-size:clamp(36px,6vw,72px);
+  font-weight:800;
+  line-height:1.05;
+  letter-spacing:-.03em;
+  color:#fff;
+  margin-bottom:8px;
+}
+.hero h1 .hl{color:var(--teal)}
+.hero-sub{
+  font-size:13px;color:var(--text2);
+  margin:20px 0 28px;max-width:540px;line-height:1.8;
+}
+.typing-wrap{
+  display:flex;align-items:center;gap:6px;
+  font-size:13px;color:var(--text2);
+  margin-bottom:36px;
+}
+.typing-wrap .prompt{color:var(--teal)}
+.typing-wrap #typed{color:var(--text)}
+.cursor{
+  display:inline-block;width:8px;height:15px;
+  background:var(--teal);
+  animation:blink .7s step-end infinite;vertical-align:middle;
+}
+
+.hero-badges{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:40px}
+.badge{
+  font-size:11px;padding:5px 12px;border-radius:2px;
+  border:1px solid var(--border2);
+  color:var(--text2);letter-spacing:.04em;
+  background:var(--bg2);
+}
+.badge.active{border-color:var(--teal);color:var(--teal);background:var(--teal-glow)}
+
+.hero-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--border);border:1px solid var(--border);border-radius:4px;overflow:hidden}
+.h-stat{background:var(--bg2);padding:16px;text-align:center}
+.h-stat .n{font-family:var(--font-display);font-size:28px;font-weight:800;color:var(--teal);line-height:1}
+.h-stat .l{font-size:10px;color:var(--text3);margin-top:4px;letter-spacing:.06em}
+
+/* ── SECTION ──────────────────────────────────────────────── */
+.section{margin-bottom:70px}
+.section-head{
+  display:flex;align-items:center;gap:12px;
+  margin-bottom:28px;
+}
+.section-num{font-size:11px;color:var(--teal);font-family:var(--font-mono)}
+.section-head h2{
+  font-family:var(--font-display);font-size:22px;font-weight:700;
+  color:#fff;letter-spacing:-.02em;
+}
+.section-line{flex:1;height:1px;background:var(--border)}
+
+/* ── SKILLS ───────────────────────────────────────────────── */
+.skills-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.skill-item{background:var(--bg2);border:1px solid var(--border);border-radius:4px;padding:14px 16px}
+.skill-item:hover{border-color:var(--border2)}
+.skill-top{display:flex;justify-content:space-between;margin-bottom:10px}
+.skill-name{font-size:12px;color:var(--text)}
+.skill-pct{font-size:12px;font-weight:700;color:var(--teal)}
+.skill-track{height:3px;background:var(--bg3);border-radius:1px;overflow:hidden}
+.skill-bar{
+  height:100%;border-radius:1px;
+  width:0;
+  transition:width 1.6s cubic-bezier(.4,0,.2,1);
+}
+
+/* ── SOFT SKILLS ──────────────────────────────────────────── */
+.soft-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.soft-card{
+  background:var(--bg2);border:1px solid var(--border);
+  border-radius:4px;padding:16px;text-align:center;
+}
+.soft-card:hover{border-color:var(--border2)}
+.soft-card svg{overflow:visible;margin-bottom:8px}
+.soft-card .sname{font-size:12px;color:var(--text);margin-bottom:2px}
+.soft-card .sdesc{font-size:10px;color:var(--text3);line-height:1.4}
+
+/* ── TECH STACK ───────────────────────────────────────────── */
+.tech-cats{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+.tech-cat{background:var(--bg2);border:1px solid var(--border);border-radius:4px;padding:16px}
+.tech-cat-label{
+  font-size:10px;letter-spacing:.1em;color:var(--text3);
+  margin-bottom:10px;display:flex;align-items:center;gap:6px;
+}
+.tech-cat-label::before{content:'▸';color:var(--teal)}
+.tech-tags{display:flex;flex-wrap:wrap;gap:6px}
+.tech-tag{
+  font-size:11px;padding:3px 8px;
+  border:1px solid var(--border2);border-radius:2px;color:var(--text2);
+}
+
+/* ── PROJECTS ─────────────────────────────────────────────── */
+.projects-list{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.proj-card{
+  background:var(--bg2);border:1px solid var(--border);
+  border-radius:4px;padding:18px;
+  position:relative;overflow:hidden;
+  transition:border-color .2s,transform .2s;
+}
+.proj-card::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:2px;
+  background:var(--accent,var(--teal));
+  transform:scaleX(0);transform-origin:left;
+  transition:transform .3s ease;
+}
+.proj-card:hover::before{transform:scaleX(1)}
+.proj-card:hover{border-color:var(--border2);transform:translateY(-2px)}
+.proj-num{font-size:10px;color:var(--text3);margin-bottom:10px}
+.proj-card h3{font-family:var(--font-display);font-size:14px;font-weight:600;color:#fff;margin-bottom:6px}
+.proj-card p{font-size:11px;color:var(--text2);line-height:1.6;margin-bottom:10px}
+.proj-lang{font-size:10px;display:flex;align-items:center;gap:5px}
+.lang-dot{width:7px;height:7px;border-radius:50%}
+
+/* ── TIMELINE ─────────────────────────────────────────────── */
+.tl{position:relative;padding-left:20px}
+.tl::before{
+  content:'';position:absolute;left:3px;top:8px;bottom:8px;
+  width:1px;background:var(--border);
+}
+.tl-item{
+  position:relative;padding:0 0 24px 24px;
+}
+.tl-item:last-child{padding-bottom:0}
+.tl-dot{
+  position:absolute;left:-18px;top:6px;
+  width:8px;height:8px;border-radius:50%;
+  border:1px solid var(--teal);background:var(--bg);
+}
+.tl-dot.active{background:var(--teal)}
+.tl-year{font-size:10px;color:var(--teal);letter-spacing:.08em;margin-bottom:2px}
+.tl-title{font-size:13px;color:#fff;margin-bottom:2px}
+.tl-sub{font-size:11px;color:var(--text3)}
+.tl-role{
+  display:inline-block;font-size:10px;
+  padding:1px 7px;border-radius:2px;
+  margin-left:8px;vertical-align:middle;
+}
+.role-p{background:rgba(46,232,165,.1);color:var(--teal);border:1px solid var(--teal-dim)}
+.role-a{background:rgba(167,139,250,.1);color:var(--purple);border:1px solid var(--purple-dim)}
+.role-i{background:rgba(251,191,36,.1);color:var(--amber);border:1px solid #92600a}
+
+/* ── CERTS ────────────────────────────────────────────────── */
+.certs-list{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.cert-item{
+  background:var(--bg2);border:1px solid var(--border);
+  border-radius:4px;padding:12px 14px;
+  display:flex;align-items:flex-start;gap:10px;
+}
+.cert-year{
+  font-size:10px;color:var(--teal);font-weight:700;
+  min-width:32px;padding-top:1px;
+}
+.cert-info h4{font-size:12px;color:var(--text);margin-bottom:2px}
+.cert-info p{font-size:10px;color:var(--text3)}
+
+/* ── CONTACT ──────────────────────────────────────────────── */
+.contact-box{
+  background:var(--bg2);border:1px solid var(--border);
+  border-radius:4px;padding:28px;
+  display:flex;justify-content:space-between;align-items:center;
+  flex-wrap:wrap;gap:20px;
+}
+.contact-left h3{
+  font-family:var(--font-display);font-size:20px;font-weight:700;
+  color:#fff;margin-bottom:6px;
+}
+.contact-left p{font-size:12px;color:var(--text2)}
+.contact-links{display:flex;flex-direction:column;gap:8px;align-items:flex-end}
+.contact-link{
+  font-size:12px;color:var(--text2);text-decoration:none;
+  display:flex;align-items:center;gap:6px;
+  transition:color .2s;
+}
+.contact-link:hover{color:var(--teal)}
+.contact-link::before{content:'→';font-size:10px;color:var(--teal)}
+
+/* ── FOOTER ───────────────────────────────────────────────── */
+footer{
+  border-top:1px solid var(--border);
+  padding:24px 0;
+  display:flex;justify-content:space-between;align-items:center;
+  font-size:11px;color:var(--text3);
+}
+.footer-quote{font-style:italic}
+
+/* ── SCROLLBAR ────────────────────────────────────────────── */
+::-webkit-scrollbar{width:4px}
+::-webkit-scrollbar-track{background:var(--bg)}
+::-webkit-scrollbar-thumb{background:var(--teal-dim);border-radius:2px}
+
+/* ── RESPONSIVE ───────────────────────────────────────────── */
+@media(max-width:640px){
+  .skills-grid,.tech-cats,.soft-grid,.projects-list,.certs-list{grid-template-columns:1fr}
+  .hero-stats{grid-template-columns:repeat(2,1fr)}
+  .contact-box{flex-direction:column}
+  .contact-links{align-items:flex-start}
+  nav{flex-direction:column;gap:12px;text-align:center}
+}
+</style>
+</head>
+<body>
+
+<div class="scanline"></div>
+
+<div class="page">
+
+  <!-- NAV -->
+  <nav class="reveal">
+    <div class="nav-logo">sebas99032</div>
+    <div class="nav-links">
+      <a href="#skills">Skills</a>
+      <a href="#proyectos">Proyectos</a>
+      <a href="#academia">Academia</a>
+      <a href="#contacto">Contacto</a>
+    </div>
+  </nav>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-label">Ingeniero de Sistemas · Colombia</div>
+    <h1>Sebastián<br><span class="hl">Fernández</span><br>Vertel.</h1>
+    <p class="hero-sub">
+      Desarrollador Full Stack, investigador activo y ponente internacional.
+      Construyo soluciones reales con IoT, Big Data e Inteligencia Artificial
+      desde Sincelejo, Colombia.
+    </p>
+    <div class="typing-wrap">
+      <span class="prompt">$&nbsp;</span>
+      <span id="typed"></span>
+      <span class="cursor"></span>
+    </div>
+    <div class="hero-badges">
+      <span class="badge active">10° Semestre · CECAR</span>
+      <span class="badge">Semillero Soft-Dev</span>
+      <span class="badge">Semillero GEMMA</span>
+      <span class="badge">Tecnológico de Monterrey</span>
+      <span class="badge">Técnico en Gastronomía</span>
+    </div>
+    <div class="hero-stats">
+      <div class="h-stat"><div class="n" data-count="4">0</div><div class="l">Simposios internacionales</div></div>
+      <div class="h-stat"><div class="n" data-count="10">0</div><div class="l">Semestres cursados</div></div>
+      <div class="h-stat"><div class="n" data-count="300" data-plus="true">0</div><div class="l">Horas certificadas</div></div>
+      <div class="h-stat"><div class="n" data-count="23">0</div><div class="l">Repositorios GitHub</div></div>
+    </div>
+  </section>
+
+  <!-- SKILLS TÉCNICAS -->
+  <section class="section reveal" id="skills">
+    <div class="section-head">
+      <span class="section-num">01</span>
+      <h2>Habilidades técnicas</h2>
+      <div class="section-line"></div>
+    </div>
+    <div class="skills-grid" id="skills-grid"></div>
+  </section>
+
+  <!-- HABILIDADES BLANDAS -->
+  <section class="section reveal">
+    <div class="section-head">
+      <span class="section-num">02</span>
+      <h2>Habilidades blandas</h2>
+      <div class="section-line"></div>
+    </div>
+    <div class="soft-grid" id="soft-grid"></div>
+  </section>
+
+  <!-- STACK -->
+  <section class="section reveal">
+    <div class="section-head">
+      <span class="section-num">03</span>
+      <h2>Stack tecnológico</h2>
+      <div class="section-line"></div>
+    </div>
+    <div class="tech-cats">
+      <div class="tech-cat">
+        <div class="tech-cat-label">Frontend</div>
+        <div class="tech-tags">
+          <span class="tech-tag">TypeScript</span><span class="tech-tag">JavaScript</span>
+          <span class="tech-tag">HTML5</span><span class="tech-tag">CSS3</span>
+        </div>
+      </div>
+      <div class="tech-cat">
+        <div class="tech-cat-label">Backend &amp; Data</div>
+        <div class="tech-tags">
+          <span class="tech-tag">Python</span><span class="tech-tag">PHP</span>
+          <span class="tech-tag">R</span><span class="tech-tag">SQL</span>
+        </div>
+      </div>
+      <div class="tech-cat">
+        <div class="tech-cat-label">Mobile &amp; Herramientas</div>
+        <div class="tech-tags">
+          <span class="tech-tag">C#</span><span class="tech-tag">Xamarin.Forms</span>
+          <span class="tech-tag">Git</span><span class="tech-tag">Linux</span>
+        </div>
+      </div>
+      <div class="tech-cat">
+        <div class="tech-cat-label">Especialidades</div>
+        <div class="tech-tags">
+          <span class="tech-tag">IoT</span><span class="tech-tag">Big Data</span>
+          <span class="tech-tag">Machine Learning</span><span class="tech-tag">Microservicios</span>
+          <span class="tech-tag">Forense Digital</span><span class="tech-tag">Estadística Aplicada</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PROYECTOS -->
+  <section class="section reveal" id="proyectos">
+    <div class="section-head">
+      <span class="section-num">04</span>
+      <h2>Proyectos destacados</h2>
+      <div class="section-line"></div>
+    </div>
+    <div class="projects-list">
+      <div class="proj-card" style="--accent:#2ee8a5">
+        <div class="proj-num">01 / Private</div>
+        <h3>ApsunSolar</h3>
+        <p>IA + ML que analiza facturas eléctricas para calcular costos óptimos de instalación de planta solar.</p>
+        <div class="proj-lang"><div class="lang-dot" style="background:#3776AB"></div><span style="color:#94a3b8">Python</span></div>
+      </div>
+      <div class="proj-card" style="--accent:#a78bfa">
+        <div class="proj-num">02 / Private</div>
+        <h3>Fundacion MELIGEMMA</h3>
+        <p>Sitio oficial para ONG colombiana: gestión de proyectos, donaciones y contenido institucional.</p>
+        <div class="proj-lang"><div class="lang-dot" style="background:#3178C6"></div><span style="color:#94a3b8">TypeScript</span></div>
+      </div>
+      <div class="proj-card" style="--accent:#fbbf24">
+        <div class="proj-num">03 / Public</div>
+        <h3>lerm-antropometria</h3>
+        <p>Portal web para gestión y análisis de datos antropométricos del laboratorio LERM.</p>
+        <div class="proj-lang"><div class="lang-dot" style="background:#3178C6"></div><span style="color:#94a3b8">TypeScript</span></div>
+      </div>
+      <div class="proj-card" style="--accent:#fb7185">
+        <div class="proj-num">04 / Public</div>
+        <h3>ProyectoParqueadero</h3>
+        <p>Sistema completo de control de vehículos: entrada/salida, tarifas y reportes.</p>
+        <div class="proj-lang"><div class="lang-dot" style="background:#F7DF1E"></div><span style="color:#94a3b8">JavaScript</span></div>
+      </div>
+      <div class="proj-card" style="--accent:#2ee8a5">
+        <div class="proj-num">05 / Public</div>
+        <h3>ProyectoGestion</h3>
+        <p>Sistema de gestión web con base de datos relacional, autenticación y reportes dinámicos.</p>
+        <div class="proj-lang"><div class="lang-dot" style="background:#777BB4"></div><span style="color:#94a3b8">PHP</span></div>
+      </div>
+      <div class="proj-card" style="--accent:#a78bfa">
+        <div class="proj-num">06 / Private</div>
+        <h3>Layouts · Xamarin</h3>
+        <p>Aplicación móvil multiplataforma con Xamarin.Forms y .NET para Android e iOS.</p>
+        <div class="proj-lang"><div class="lang-dot" style="background:#239120"></div><span style="color:#94a3b8">C#</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ACADEMIA -->
+  <section class="section reveal" id="academia">
+    <div class="section-head">
+      <span class="section-num">05</span>
+      <h2>Participación académica</h2>
+      <div class="section-line"></div>
+    </div>
+    <div class="tl" id="timeline"></div>
+  </section>
+
+  <!-- CERTIFICACIONES -->
+  <section class="section reveal">
+    <div class="section-head">
+      <span class="section-num">06</span>
+      <h2>Certificaciones</h2>
+      <div class="section-line"></div>
+    </div>
+    <div class="certs-list">
+      <div class="cert-item"><div class="cert-year">2025</div><div class="cert-info"><h4>Taller de Análisis Forense Digital</h4><p>Univ. FASTA / InFo-Lab / CECAR · 24 horas virtual</p></div></div>
+      <div class="cert-item"><div class="cert-year">2024</div><div class="cert-info"><h4>Inteligencia Artificial (50 h)</h4><p>MinTIC · Universidad Distrital Francisco José de Caldas</p></div></div>
+      <div class="cert-item"><div class="cert-year">2024</div><div class="cert-info"><h4>Principiante en Programación G6 – ONE (62 h)</h4><p>Oracle + ALURA LATAM</p></div></div>
+      <div class="cert-item"><div class="cert-year">2024</div><div class="cert-info"><h4>Lógica de Programación con JavaScript (24 h)</h4><p>ALURA LATAM</p></div></div>
+      <div class="cert-item"><div class="cert-year">2023</div><div class="cert-info"><h4>Programación Web: HTML, CSS &amp; JS (60 h)</h4><p>Tecnológico de Monterrey · Centro Virtual de Aprendizaje</p></div></div>
+      <div class="cert-item"><div class="cert-year">2023</div><div class="cert-info"><h4>Evaluador de Procesos (61 h · 9.33/10)</h4><p>Capacítate para el Empleo · Fundación Carlos Slim</p></div></div>
+      <div class="cert-item"><div class="cert-year">2024</div><div class="cert-info"><h4>Desarrollo Personal G6 – ONE (35 h)</h4><p>Oracle + ALURA LATAM</p></div></div>
+      <div class="cert-item"><div class="cert-year">2019</div><div class="cert-info"><h4>Fortalecimiento de Habilidades Laborales</h4><p>GUEPA – GFI &amp; GEMMA · Universidad de Sucre</p></div></div>
+    </div>
+  </section>
+
+  <!-- CONTACTO -->
+  <section class="section reveal" id="contacto">
+    <div class="section-head">
+      <span class="section-num">07</span>
+      <h2>Contacto</h2>
+      <div class="section-line"></div>
+    </div>
+    <div class="contact-box">
+      <div class="contact-left">
+        <h3>¿Hablamos?</h3>
+        <p>Abierto a colaboraciones, investigaciones y proyectos.</p>
+      </div>
+      <div class="contact-links">
+        <a class="contact-link" href="mailto:sebastian.fernandez@cecar.edu.co">sebastian.fernandez@cecar.edu.co</a>
+        <a class="contact-link" href="https://linkedin.com/in/sebastian-david-fernandezvertel-652017258/" target="_blank">LinkedIn</a>
+        <a class="contact-link" href="https://github.com/sebas99032" target="_blank">github.com/sebas99032</a>
+        <a class="contact-link" href="#">Sincelejo, Sucre · Colombia</a>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <span>© 2026 · Sebastián David Fernández Vertel</span>
+    <span class="footer-quote">"El conocimiento crece cuando se comparte."</span>
+  </footer>
+
+</div>
+
+<script>
+/* ── DATA ──────────────────────────────────────────────────── */
+const skills = [
+  { name: 'Desarrollo Web Full Stack', pct: 82, color: '#2ee8a5' },
+  { name: 'Machine Learning / IA',     pct: 70, color: '#a78bfa' },
+  { name: 'Análisis Estadístico',      pct: 78, color: '#fbbf24' },
+  { name: 'Automatización & IoT',      pct: 72, color: '#2ee8a5' },
+  { name: 'Bases de Datos',            pct: 75, color: '#a78bfa' },
+  { name: 'Desarrollo Móvil',          pct: 60, color: '#fbbf24' },
+  { name: 'Análisis Forense Digital',  pct: 55, color: '#fb7185' },
+  { name: 'Investigación Académica',   pct: 88, color: '#2ee8a5' },
+];
+
+const softSkills = [
+  { name: 'Investigación',        pct: 90, color: '#2ee8a5', desc: 'Ponente en simposios internacionales' },
+  { name: 'Trabajo en equipo',    pct: 88, color: '#a78bfa', desc: 'Semilleros Soft-Dev y GEMMA' },
+  { name: 'Comunicación',         pct: 85, color: '#fbbf24', desc: 'Presentaciones académicas' },
+  { name: 'Aprendizaje continuo', pct: 92, color: '#2ee8a5', desc: '300+ horas certificadas' },
+  { name: 'Resolución de problemas', pct: 83, color: '#fb7185', desc: 'Proyectos de impacto real' },
+  { name: 'Liderazgo',            pct: 75, color: '#a78bfa', desc: 'Comité ORME · Ponente' },
+];
+
+const timeline = [
+  { year: '2025', title: 'Taller Análisis Forense Digital', sub: 'Univ. FASTA / InFo-Lab / CECAR · Virtual', role: 'a' },
+  { year: '2024', title: 'IX Simposio Internacional de Ingeniería de Sistemas', sub: 'CECAR · Sincelejo', role: 'a' },
+  { year: '2024', title: 'Proyecto IA Planta Solar · Semillero Soft-Dev', sub: 'Apsun Solar · CECAR', role: 'p' },
+  { year: '2022', title: 'IV Congreso Internacional de Ingeniería y Diseño', sub: 'Tecnologías Emergentes · CECAR', role: 'a' },
+  { year: '2019', title: 'Pasantía de Investigación', sub: 'Tecnológico de Monterrey · SNI Nivel II · CDMX', role: 'i' },
+  { year: '2018', title: '1st Conference on Statistics and Data Science', sub: 'Federal Univ. of Bahia · Salvador, Brasil', role: 'p' },
+  { year: '2018', title: 'XXVIII Simposio Nacional de Estadística', sub: 'Universidad Nacional · Bucaramanga', role: 'p' },
+  { year: '2016', title: 'XXVI Simposio Internacional de Estadística', sub: 'Universidad de Sucre · Sincelejo', role: 'p' },
+  { year: '2014', title: 'XXIV Simposio Internacional de Estadística', sub: 'Universidad Nacional · Bogotá D.C.', role: 'p' },
+];
+
+/* ── BUILD SKILLS ──────────────────────────────────────────── */
+const sg = document.getElementById('skills-grid');
+skills.forEach(s => {
+  sg.innerHTML += `<div class="skill-item">
+    <div class="skill-top">
+      <span class="skill-name">${s.name}</span>
+      <span class="skill-pct" style="color:${s.color}">${s.pct}%</span>
+    </div>
+    <div class="skill-track">
+      <div class="skill-bar" data-pct="${s.pct}" style="background:${s.color}"></div>
+    </div>
+  </div>`;
+});
+
+/* ── BUILD SOFT SKILLS ─────────────────────────────────────── */
+const softG = document.getElementById('soft-grid');
+softSkills.forEach(s => {
+  const R = 28, cx = 30, cy = 30;
+  const circ = 2 * Math.PI * R;
+  const filled = circ * (s.pct / 100);
+  const offset = circ - filled;
+  softG.innerHTML += `<div class="soft-card">
+    <svg width="60" height="60" viewBox="0 0 60 60">
+      <circle cx="${cx}" cy="${cy}" r="${R}" fill="none" stroke="rgba(255,255,255,.06)" stroke-width="3"/>
+      <circle cx="${cx}" cy="${cy}" r="${R}" fill="none" stroke="${s.color}" stroke-width="3"
+        stroke-dasharray="${circ}" stroke-dashoffset="${circ}"
+        stroke-linecap="round"
+        transform="rotate(-90 ${cx} ${cy})"
+        class="soft-arc" data-offset="${offset}" data-circ="${circ}"
+        style="transition:stroke-dashoffset 1.6s cubic-bezier(.4,0,.2,1)"/>
+      <text x="${cx}" y="${cy+5}" text-anchor="middle"
+        font-family="'Space Mono',monospace" font-size="11" font-weight="700" fill="${s.color}">${s.pct}%</text>
+    </svg>
+    <div class="sname">${s.name}</div>
+    <div class="sdesc">${s.desc}</div>
+  </div>`;
+});
+
+/* ── BUILD TIMELINE ────────────────────────────────────────── */
+const tl = document.getElementById('timeline');
+timeline.forEach((t, i) => {
+  const isLast = i === timeline.length - 1;
+  const roleLabel = t.role === 'p' ? 'Ponente' : t.role === 'i' ? 'Investigador' : 'Asistente';
+  const roleClass = t.role === 'p' ? 'role-p' : t.role === 'i' ? 'role-i' : 'role-a';
+  const dotActive = (t.role === 'p' || t.role === 'i') ? 'active' : '';
+  tl.innerHTML += `<div class="tl-item">
+    <div class="tl-dot ${dotActive}"></div>
+    <div class="tl-year">${t.year}</div>
+    <div class="tl-title">${t.title}<span class="tl-role ${roleClass}">${roleLabel}</span></div>
+    <div class="tl-sub">${t.sub}</div>
+  </div>`;
+});
+
+/* ── TYPING EFFECT ─────────────────────────────────────────── */
+const phrases = [
+  'apasionado por IoT y Big Data',
+  'investigador en semilleros Soft-Dev y GEMMA',
+  'desarrollador de soluciones reales',
+  'ponente en conferencias internacionales',
+  'construyendo desde Sincelejo para el mundo',
+];
+let pi = 0, ci = 0, deleting = false;
+const typed = document.getElementById('typed');
+function typeLoop() {
+  const p = phrases[pi];
+  if (!deleting) {
+    typed.textContent = p.slice(0, ci + 1); ci++;
+    if (ci === p.length) { deleting = true; setTimeout(typeLoop, 2000); return; }
+  } else {
+    typed.textContent = p.slice(0, ci - 1); ci--;
+    if (ci === 0) { deleting = false; pi = (pi + 1) % phrases.length; }
+  }
+  setTimeout(typeLoop, deleting ? 30 : 65);
+}
+typeLoop();
+
+/* ── COUNT UP ──────────────────────────────────────────────── */
+function countUp(el, target, plus, dur) {
+  let start = null;
+  (function step(ts) {
+    if (!start) start = ts;
+    const prog = Math.min((ts - start) / dur, 1);
+    el.textContent = Math.round(prog * target) + (plus ? '+' : '');
+    if (prog < 1) requestAnimationFrame(step);
+  })(performance.now());
+}
+
+/* ── INTERSECTION OBSERVER ─────────────────────────────────── */
+let barsAnimated = false;
+let countersAnimated = false;
+
+const obs = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if (!e.isIntersecting) return;
+    const el = e.target;
+
+    if (el.classList.contains('reveal')) {
+      el.classList.add('visible');
+    }
+    if (el.id === 'skills-grid' && !barsAnimated) {
+      barsAnimated = true;
+      document.querySelectorAll('.skill-bar').forEach(b => {
+        b.style.width = b.dataset.pct + '%';
+      });
+      document.querySelectorAll('.soft-arc').forEach(a => {
+        a.style.strokeDashoffset = a.dataset.offset;
+      });
+    }
+    if (el.classList.contains('hero') && !countersAnimated) {
+      countersAnimated = true;
+      document.querySelectorAll('[data-count]').forEach(n => {
+        countUp(n, +n.dataset.count, n.dataset.plus === 'true', 1400);
+      });
+    }
+  });
+}, { threshold: 0.15 });
+
+document.querySelectorAll('.reveal, #skills-grid, .hero').forEach(el => obs.observe(el));
+</script>
+</body>
+</html>
